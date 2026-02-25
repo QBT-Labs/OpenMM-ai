@@ -82,12 +82,12 @@ Self-contained plugin packages for structured agent integration:
 |--------|-------------|------|
 | **[openmm-trading](packages/plugins/openmm-trading)** | Exchange setup, order management, and grid trading strategies | `packages/plugins/openmm-trading` |
 | **[openmm-market-data](packages/plugins/openmm-market-data)** | Market data, portfolio tracking, and Cardano DEX integration | `packages/plugins/openmm-market-data` |
+| **[openclaw-openmm](packages/plugins/openclaw-openmm)** | OpenClaw plugin — agent tools and commands for Telegram/Discord | `packages/plugins/openclaw-openmm` |
 
 ### Install a plugin (OpenClaw)
 
 ```bash
-openclaw plugins install @qbtlabs/openmm-trading
-openclaw plugins install @qbtlabs/openmm-market-data
+openclaw plugins install @qbtlabs/openclaw-openmm
 ```
 
 ---
