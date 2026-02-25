@@ -8,7 +8,7 @@ metadata:
     emoji: "📊"
     requires:
       bins: [openmm]
-      env: [MEXC_API_KEY]
+      env: [MEXC_API_KEY, GATEIO_API_KEY, BITGET_API_KEY, KRAKEN_API_KEY]
     install:
       - kind: node
         package: "@3rd-eye-labs/openmm"
