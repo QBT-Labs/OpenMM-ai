@@ -3,6 +3,15 @@ name: openmm-exchange-setup
 version: 0.1.0
 description: "Step-by-step guide to configure exchange API credentials for OpenMM."
 tags: [openmm, setup, exchanges, configuration]
+metadata:
+  openclaw:
+    emoji: "🔑"
+    requires:
+      bins: [openmm]
+    install:
+      - kind: node
+        package: "@3rd-eye-labs/openmm"
+        bins: [openmm]
 ---
 
 # OpenMM Exchange Setup

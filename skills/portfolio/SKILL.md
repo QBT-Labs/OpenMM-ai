@@ -3,6 +3,16 @@ name: openmm-portfolio
 version: 0.1.0
 description: "Balance tracking, order overview, and market data across exchanges using OpenMM."
 tags: [openmm, portfolio, balance, orders, market-data]
+metadata:
+  openclaw:
+    emoji: "💼"
+    requires:
+      bins: [openmm]
+      env: [MEXC_API_KEY]
+    install:
+      - kind: node
+        package: "@3rd-eye-labs/openmm"
+        bins: [openmm]
 ---
 
 # OpenMM Portfolio Management
