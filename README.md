@@ -3,6 +3,9 @@
 > Open-source market making skills for AI agents
 
 [![npm](https://img.shields.io/npm/v/@3rd-eye-labs/openmm)](https://www.npmjs.com/package/@3rd-eye-labs/openmm)
+[![openmm-trading](https://img.shields.io/npm/v/@qbtlabs/openmm-trading?label=openmm-trading)](https://www.npmjs.com/package/@qbtlabs/openmm-trading)
+[![openmm-market-data](https://img.shields.io/npm/v/@qbtlabs/openmm-market-data?label=openmm-market-data)](https://www.npmjs.com/package/@qbtlabs/openmm-market-data)
+[![openclaw-openmm](https://img.shields.io/npm/v/@qbtlabs/openclaw-openmm?label=openclaw-openmm)](https://www.npmjs.com/package/@qbtlabs/openclaw-openmm)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![DeepWiki](https://img.shields.io/badge/docs-DeepWiki-purple)](https://deepwiki.com/3rd-Eye-Labs/OpenMM)
 

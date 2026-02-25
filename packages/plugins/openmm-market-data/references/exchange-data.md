@@ -5,7 +5,7 @@ Exchange-specific notes for market data queries and portfolio tracking.
 ## MEXC
 
 - **Minimum order:** 1 USDT
-- **Credentials:** `MEXC_API_KEY`, `MEXC_SECRET_KEY`
+- **Credentials:** `MEXC_API_KEY`, `MEXC_SECRET`
 - **Supported Cardano tokens:** SNEK/USDT, INDY/USDT, NIGHT/USDT
 - **Symbol format:** `BASE/QUOTE` (e.g., `BTC/USDT`, `ETH/USDT`)
 - **Notes:** Most Cardano native tokens are listed here. Good source for CEX price comparison against DEX.

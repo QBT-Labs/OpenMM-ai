@@ -58,7 +58,7 @@ When the OpenMM MCP server is connected, these trading tools are available:
 
 Each exchange requires its own set of credentials:
 
-- **MEXC:** `MEXC_API_KEY`, `MEXC_SECRET_KEY`
+- **MEXC:** `MEXC_API_KEY`, `MEXC_SECRET`
 - **Gate.io:** `GATEIO_API_KEY`, `GATEIO_SECRET`
 - **Kraken:** `KRAKEN_API_KEY`, `KRAKEN_SECRET`
 - **Bitget:** `BITGET_API_KEY`, `BITGET_SECRET`, `BITGET_PASSPHRASE`

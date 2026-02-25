@@ -44,7 +44,7 @@ npm install -g @3rd-eye-labs/openmm
 
 # Set exchange credentials as environment variables
 export MEXC_API_KEY="your_api_key"
-export MEXC_SECRET_KEY="your_secret_key"
+export MEXC_SECRET="your_secret_key"
 
 # Check balances
 openmm balance --exchange mexc
@@ -68,7 +68,7 @@ Run `npx @qbtlabs/openmm-mcp` to start a local MCP server over stdio. This expos
       "args": ["@qbtlabs/openmm-mcp"],
       "env": {
         "MEXC_API_KEY": "your_key",
-        "MEXC_SECRET_KEY": "your_secret"
+        "MEXC_SECRET": "your_secret"
       }
     }
   }
@@ -85,7 +85,7 @@ import { OpenMM } from '@3rd-eye-labs/openmm';
 const mm = new OpenMM({
   exchange: 'mexc',
   apiKey: process.env.MEXC_API_KEY,
-  secret: process.env.MEXC_SECRET_KEY
+  secret: process.env.MEXC_SECRET
 });
 
 const orderbook = await mm.getOrderbook('BTC/USDT');
@@ -100,7 +100,7 @@ Exchange credentials are configured via environment variables — keys are store
 ```env
 # MEXC (API key + secret)
 MEXC_API_KEY=your_mexc_api_key
-MEXC_SECRET_KEY=your_mexc_secret_key
+MEXC_SECRET=your_mexc_secret_key
 
 # Gate.io (API key + secret)
 GATEIO_API_KEY=your_gateio_api_key

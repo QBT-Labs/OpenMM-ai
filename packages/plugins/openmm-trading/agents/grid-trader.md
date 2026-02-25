@@ -136,7 +136,7 @@ Set `--confidence` to require a minimum price confidence before trading:
 
 ### MEXC
 - Minimum order value: 1 USDT
-- Environment variables: `MEXC_API_KEY`, `MEXC_SECRET_KEY`
+- Environment variables: `MEXC_API_KEY`, `MEXC_SECRET`
 - Good liquidity for most USDT pairs
 - No passphrase required
 

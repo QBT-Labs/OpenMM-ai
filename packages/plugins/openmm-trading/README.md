@@ -69,7 +69,7 @@ npm install -g @3rd-eye-labs/openmm
 
 ```bash
 export MEXC_API_KEY="your_api_key"
-export MEXC_SECRET_KEY="your_secret_key"
+export MEXC_SECRET="your_secret_key"
 ```
 
 3. Verify connection:
@@ -95,7 +95,7 @@ openmm trade --strategy grid --exchange mexc --symbol BTC/USDT \
 
 | Exchange | Min Order | Credentials |
 |----------|-----------|-------------|
-| MEXC | 1 USDT | `MEXC_API_KEY`, `MEXC_SECRET_KEY` |
+| MEXC | 1 USDT | `MEXC_API_KEY`, `MEXC_SECRET` |
 | Gate.io | 1 USDT | `GATEIO_API_KEY`, `GATEIO_SECRET` |
 | Bitget | 1 USDT | `BITGET_API_KEY`, `BITGET_SECRET`, `BITGET_PASSPHRASE` |
 | Kraken | 5 EUR/USD | `KRAKEN_API_KEY`, `KRAKEN_SECRET` |
