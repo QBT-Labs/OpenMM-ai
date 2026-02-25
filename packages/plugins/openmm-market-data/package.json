@@ -1,0 +1,15 @@
+{
+  "name": "@qbtlabs/openmm-market-data",
+  "version": "0.1.0",
+  "description": "Market data, portfolio tracking, and Cardano DEX integration for OpenMM",
+  "keywords": ["openmm", "market-data", "portfolio", "cardano", "dex", "agent-skills"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/QBT-Labs/OpenMM-ai.git",
+    "directory": "packages/plugins/openmm-market-data"
+  },
+  "dependencies": {
+    "@3rd-eye-labs/openmm": "latest"
+  }
+}

@@ -74,6 +74,24 @@ Track balances and open orders across exchanges, check market prices, compare DE
 
 ---
 
+## Plugins
+
+Self-contained plugin packages for structured agent integration:
+
+| Plugin | What it does | Path |
+|--------|-------------|------|
+| **[openmm-trading](packages/plugins/openmm-trading)** | Exchange setup, order management, and grid trading strategies | `packages/plugins/openmm-trading` |
+| **[openmm-market-data](packages/plugins/openmm-market-data)** | Market data, portfolio tracking, and Cardano DEX integration | `packages/plugins/openmm-market-data` |
+
+### Install a plugin (OpenClaw)
+
+```bash
+openclaw plugins install @qbtlabs/openmm-trading
+openclaw plugins install @qbtlabs/openmm-market-data
+```
+
+---
+
 ## Components
 
 ```
@@ -81,9 +99,11 @@ OpenMM Ecosystem
 ├── OpenMM (Core)           → github.com/3rd-Eye-Labs/OpenMM
 ├── OpenMM-MCP (Tools)      → github.com/QBT-Labs/OpenMM-MCP
 └── OpenMM-AI (Skills)      → this repo
+    ├── skills/             → flat skill files (Agent Skills standard)
+    └── packages/plugins/   → structured plugin packages
 ```
 
-Each skill folder is self-contained — `SKILL.md` has the core instructions an agent needs.
+Each skill folder is self-contained — `SKILL.md` has the core instructions an agent needs. Plugins bundle related skills with references, agents, and OpenClaw integration.
 
 **x402 (coming soon)** — Payment layer for AI agent transactions is a work in progress.
 

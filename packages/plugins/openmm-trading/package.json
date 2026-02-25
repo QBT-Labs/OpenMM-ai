@@ -1,0 +1,15 @@
+{
+  "name": "@qbtlabs/openmm-trading",
+  "version": "0.1.0",
+  "description": "Exchange setup, order management, and grid trading strategies for OpenMM",
+  "keywords": ["openmm", "trading", "grid", "market-making", "agent-skills"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/QBT-Labs/OpenMM-ai.git",
+    "directory": "packages/plugins/openmm-trading"
+  },
+  "dependencies": {
+    "@3rd-eye-labs/openmm": "latest"
+  }
+}

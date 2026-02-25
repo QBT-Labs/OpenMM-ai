@@ -22,6 +22,9 @@ dist/
 build/
 *.tgz
 
+# Package lock (workspaces)
+package-lock.json
+
 # Logs
 *.log
 npm-debug.log*
