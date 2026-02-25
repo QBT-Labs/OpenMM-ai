@@ -1,6 +1,6 @@
 {
   "name": "@qbtlabs/openmm-trading",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Exchange setup, order management, and grid trading strategies for OpenMM",
   "keywords": ["openmm", "trading", "grid", "market-making", "agent-skills"],
   "files": ["skills", "references", "agents", "openclaw.plugin.json", "CLAUDE.md", "README.md"],
