@@ -19,6 +19,32 @@ metadata:
 
 Track balances, review open orders, and monitor market data across exchanges.
 
+## Required Credentials
+
+At least one exchange must be configured via environment variables. Set the credentials for each exchange you want to query:
+
+```bash
+# MEXC
+MEXC_API_KEY=your-mexc-api-key
+MEXC_SECRET=your-mexc-secret
+MEXC_UID=your-mexc-uid-for-whitelisted-access
+
+# Gate.io
+GATEIO_API_KEY=your-gateio-api-key
+GATEIO_SECRET=your-gateio-secret
+
+# Bitget (requires passphrase)
+BITGET_API_KEY=your-bitget-api-key
+BITGET_SECRET=your-bitget-secret
+BITGET_PASSPHRASE=your-bitget-passphrase
+
+# Kraken
+KRAKEN_API_KEY=your-kraken-api-key
+KRAKEN_SECRET=your-kraken-secret
+```
+
+See the [exchange-setup](../../skills/exchange-setup/SKILL.md) skill for detailed configuration instructions.
+
 ## View Balances
 
 ```bash
@@ -55,9 +81,6 @@ openmm orders list --exchange bitget --symbol SNEK/USDT
 
 # Limit results
 openmm orders list --exchange kraken --limit 5
-
-# Get specific order details
-openmm orders get --exchange mexc --id 123456 --symbol BTC/USDT
 ```
 
 ## Check Market Prices
@@ -103,14 +126,15 @@ When using the MCP server, these tools are relevant for portfolio management:
 | `get_balance` | Get balances for an exchange (all or specific asset) |
 | `list_orders` | List open orders on an exchange |
 | `get_ticker` | Current price for a trading pair |
-| `get_strategy_status` | Grid status with open orders and spread |
+| `get_orderbook` | Order book depth (bids/asks) |
+| `get_trades` | Recent trades with buy/sell summary |
 | `get_cardano_price` | Aggregated Cardano token price |
-
-The MCP server also provides a `portfolio_overview` prompt that automatically summarizes balances and open orders for an exchange.
+| `discover_pools` | Discover Cardano DEX liquidity pools |
 
 ## Tips for Agents
 
 1. **Check balances before trading** — always verify available funds
 2. **Query each exchange separately** — there is no cross-exchange aggregate command
 3. **Use `--json` for parsing** — structured output for programmatic use
-4. **Monitor grid strategies** — use `get_strategy_status` MCP tool to check active grids
+4. **Use `BASE/QUOTE` format** — e.g. `BTC/USDT`, `ADA/EUR`, `SNEK/USDT`
+5. **Respect minimum order values** — MEXC/Gate.io/Bitget: 1 USDT, Kraken: 5 EUR/USD
