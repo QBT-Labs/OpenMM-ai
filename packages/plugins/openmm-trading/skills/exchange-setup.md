@@ -82,7 +82,7 @@ OpenMM uses environment variables for credentials. Add them to your `.env` file 
 ```bash
 # MEXC
 export MEXC_API_KEY="your_mexc_api_key"
-export MEXC_SECRET_KEY="your_mexc_secret_key"
+export MEXC_SECRET="your_mexc_secret_key"
 
 # Gate.io
 export GATEIO_API_KEY="your_gateio_api_key"
@@ -102,7 +102,7 @@ Or create a `.env` file in the project root:
 
 ```env
 MEXC_API_KEY=your_mexc_api_key
-MEXC_SECRET_KEY=your_mexc_secret_key
+MEXC_SECRET=your_mexc_secret_key
 GATEIO_API_KEY=your_gateio_api_key
 GATEIO_SECRET=your_gateio_secret_key
 BITGET_API_KEY=your_bitget_api_key
@@ -151,7 +151,7 @@ To use OpenMM as an MCP server, add to your MCP client config:
       "args": ["@qbtlabs/openmm-mcp"],
       "env": {
         "MEXC_API_KEY": "your_key",
-        "MEXC_SECRET_KEY": "your_secret",
+        "MEXC_SECRET": "your_secret",
         "KRAKEN_API_KEY": "your_key",
         "KRAKEN_SECRET": "your_secret"
       }
@@ -167,7 +167,7 @@ Only include env vars for exchanges you want to use.
 ### "credentials not found"
 - Verify environment variables are set: `echo $MEXC_API_KEY`
 - Check `.env` file is in the correct directory
-- Ensure variable names match exactly (e.g. `MEXC_SECRET_KEY` not `MEXC_SECRET`)
+- Ensure variable names match exactly (e.g. `MEXC_SECRET` not `MEXC_SECRET_KEY`)
 
 ### "credentials validation failed" (Bitget)
 - Verify all three vars: `BITGET_API_KEY`, `BITGET_SECRET`, `BITGET_PASSPHRASE`

@@ -60,7 +60,7 @@ npm install -g @3rd-eye-labs/openmm
 
 ```bash
 export MEXC_API_KEY="your_key"
-export MEXC_SECRET_KEY="your_secret"
+export MEXC_SECRET="your_secret"
 ```
 
 ### 3. Check Balances
@@ -107,7 +107,7 @@ When using the MCP server, these tools are available for market data:
 
 | Exchange | Env Vars | Min Order | Notes |
 |----------|----------|-----------|-------|
-| MEXC | `MEXC_API_KEY`, `MEXC_SECRET_KEY` | 1 USDT | SNEK/USDT, INDY/USDT, NIGHT/USDT |
+| MEXC | `MEXC_API_KEY`, `MEXC_SECRET` | 1 USDT | SNEK/USDT, INDY/USDT, NIGHT/USDT |
 | Gate.io | `GATEIO_API_KEY`, `GATEIO_SECRET` | 1 USDT | |
 | Kraken | `KRAKEN_API_KEY`, `KRAKEN_SECRET` | 5 EUR/USD | Fiat pairs (EUR, USD, GBP), ADA/EUR |
 | Bitget | `BITGET_API_KEY`, `BITGET_SECRET`, `BITGET_PASSPHRASE` | 1 USDT | 6 decimal price precision for SNEK/NIGHT |

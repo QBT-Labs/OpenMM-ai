@@ -154,7 +154,7 @@ When using OpenMM as an MCP server, the following tools are available for order 
 
 **MEXC:**
 - Minimum order value: 1 USDT
-- Env vars: `MEXC_API_KEY`, `MEXC_SECRET_KEY`
+- Env vars: `MEXC_API_KEY`, `MEXC_SECRET`
 
 **Gate.io:**
 - Minimum order value: 1 USDT
