@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Exchange setup, order management, and grid trading strategies for OpenMM",
   "keywords": ["openmm", "trading", "grid", "market-making", "agent-skills"],
+  "files": ["skills", "references", "agents", "openclaw.plugin.json", "CLAUDE.md", "README.md"],
   "license": "MIT",
   "repository": {
     "type": "git",

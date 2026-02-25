@@ -1,0 +1,39 @@
+name: Publish Packages
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org
+
+      - run: npm install
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Publish @qbtlabs/openmm-trading
+        run: npm run publish:trading
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish @qbtlabs/openmm-market-data
+        run: npm run publish:market-data
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish @qbtlabs/openclaw-openmm
+        run: npm run publish:openclaw
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
