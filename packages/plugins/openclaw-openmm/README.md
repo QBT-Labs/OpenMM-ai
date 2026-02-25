@@ -19,10 +19,10 @@ The plugin calls the OpenMM CLI under the hood. Install it globally:
 npm install -g @3rd-eye-labs/openmm
 ```
 
-Verify it works:
+Verify it's installed:
 
 ```bash
-openmm --version
+which openmm
 ```
 
 ### Step 2: Install the plugin
