@@ -26,6 +26,10 @@ OpenMM integrates with Cardano DEX liquidity pools via the **Iris Protocol**, ag
 
 **Supported DEXes (via Iris Protocol):** SundaeSwap, Minswap, WingRiders
 
+## Credentials
+
+No exchange API keys are required for Cardano DEX operations — all pool data is public on-chain. However, the `price-comparison` command also fetches CEX prices, which may require exchange credentials to be configured. See the [portfolio](portfolio.md) skill for exchange credential setup.
+
 ## Aggregated DEX Pricing
 
 Get the current aggregated price for a Cardano native token. Prices are calculated from on-chain DEX pool reserves, weighted by total value locked (TVL).

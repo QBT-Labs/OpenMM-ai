@@ -19,6 +19,32 @@ metadata:
 
 Track balances, review open orders, and monitor market data across exchanges.
 
+## Required Credentials
+
+At least one exchange must be configured via environment variables. Set the credentials for each exchange you want to query:
+
+```bash
+# MEXC
+MEXC_API_KEY=your-mexc-api-key
+MEXC_SECRET=your-mexc-secret
+MEXC_UID=your-mexc-uid-for-whitelisted-access
+
+# Gate.io
+GATEIO_API_KEY=your-gateio-api-key
+GATEIO_SECRET=your-gateio-secret
+
+# Bitget (requires passphrase)
+BITGET_API_KEY=your-bitget-api-key
+BITGET_SECRET=your-bitget-secret
+BITGET_PASSPHRASE=your-bitget-passphrase
+
+# Kraken
+KRAKEN_API_KEY=your-kraken-api-key
+KRAKEN_SECRET=your-kraken-secret
+```
+
+See the [exchange-setup](../../skills/exchange-setup/SKILL.md) skill for detailed configuration instructions.
+
 ## View Balances
 
 ```bash
