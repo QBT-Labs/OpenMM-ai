@@ -115,6 +115,11 @@ These commands execute immediately without invoking the AI agent:
 | `/balance [exchange]` | Quick balance check | `/balance mexc` |
 | `/price <exchange> <symbol>` | Quick price check | `/price kraken ADA/EUR` |
 | `/strategy <exchange> <symbol>` | Grid strategy status | `/strategy mexc SNEK/USDT` |
+| `/orders [exchange]` | List open orders | `/orders bitget` |
+| `/orderbook <exchange> <symbol>` | Order book (top 10) | `/orderbook mexc BTC/USDT` |
+| `/pools <token>` | Discover Cardano DEX pools | `/pools SNEK` |
+| `/cardano <token>` | Cardano token DEX price | `/cardano INDY` |
+| `/cancel-all <exchange> [symbol]` | Cancel all open orders (auth required) | `/cancel-all mexc SNEK/USDT` |
 
 ---
 

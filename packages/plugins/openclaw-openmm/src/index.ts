@@ -365,6 +365,98 @@ export default function register(api: any) {
     },
   });
 
+  api.registerCommand({
+    name: "orders",
+    description: "List open orders. Usage: /orders [exchange]",
+    acceptsArgs: true,
+    handler: async (ctx: { args?: string }) => {
+      const exchange = ctx.args?.trim() || "mexc";
+      try {
+        const result = await openmm(["orders", "list", "--exchange", exchange]);
+        return { text: result };
+      } catch (err: any) {
+        return { text: `Error listing orders: ${err.message}` };
+      }
+    },
+  });
+
+  api.registerCommand({
+    name: "orderbook",
+    description: "Quick order book view. Usage: /orderbook <exchange> <symbol>",
+    acceptsArgs: true,
+    handler: async (ctx: { args?: string }) => {
+      const parts = ctx.args?.trim().split(/\s+/) || [];
+      if (parts.length < 2) {
+        return { text: "Usage: /orderbook <exchange> <symbol>\nExample: /orderbook kraken ADA/EUR" };
+      }
+      const [exchange, symbol] = parts;
+      try {
+        const result = await openmm(["orderbook", "--exchange", exchange, "--symbol", symbol, "--limit", "10"]);
+        return { text: result };
+      } catch (err: any) {
+        return { text: `Error fetching orderbook: ${err.message}` };
+      }
+    },
+  });
+
+  api.registerCommand({
+    name: "pools",
+    description: "Discover Cardano DEX pools. Usage: /pools <token>",
+    acceptsArgs: true,
+    handler: async (ctx: { args?: string }) => {
+      const token = ctx.args?.trim();
+      if (!token) {
+        return { text: "Usage: /pools <token>\nExample: /pools SNEK" };
+      }
+      try {
+        const result = await openmm(["pool-discovery", "discover", token]);
+        return { text: result };
+      } catch (err: any) {
+        return { text: `Error discovering pools: ${err.message}` };
+      }
+    },
+  });
+
+  api.registerCommand({
+    name: "cardano",
+    description: "Cardano token DEX price. Usage: /cardano <token>",
+    acceptsArgs: true,
+    handler: async (ctx: { args?: string }) => {
+      const token = ctx.args?.trim();
+      if (!token) {
+        return { text: "Usage: /cardano <token>\nExample: /cardano INDY" };
+      }
+      try {
+        const result = await openmm(["pool-discovery", "prices", token]);
+        return { text: result };
+      } catch (err: any) {
+        return { text: `Error fetching Cardano price: ${err.message}` };
+      }
+    },
+  });
+
+  api.registerCommand({
+    name: "cancel-all",
+    description: "Cancel all open orders. Usage: /cancel-all <exchange> [symbol]",
+    acceptsArgs: true,
+    requireAuth: true,
+    handler: async (ctx: { args?: string }) => {
+      const parts = ctx.args?.trim().split(/\s+/) || [];
+      if (parts.length < 1 || !parts[0]) {
+        return { text: "Usage: /cancel-all <exchange> [symbol]\nExample: /cancel-all mexc SNEK/USDT" };
+      }
+      const [exchange, symbol] = parts;
+      try {
+        const args = ["orders", "cancel-all", "--exchange", exchange];
+        if (symbol) args.push("--symbol", symbol);
+        const result = await openmm(args);
+        return { text: result };
+      } catch (err: any) {
+        return { text: `Error cancelling orders: ${err.message}` };
+      }
+    },
+  });
+
   // ------------------------------------------------------------------
   // Background service — strategy monitoring
   // ------------------------------------------------------------------
