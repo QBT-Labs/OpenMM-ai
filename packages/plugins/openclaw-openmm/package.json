@@ -1,0 +1,18 @@
+{
+  "name": "@qbtlabs/openclaw-openmm",
+  "version": "0.1.0",
+  "description": "OpenClaw plugin for OpenMM — trade, monitor, and manage grid strategies from Telegram or any OpenClaw channel",
+  "keywords": ["openclaw", "openmm", "trading", "grid", "market-making", "telegram"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/QBT-Labs/OpenMM-ai.git",
+    "directory": "packages/plugins/openclaw-openmm"
+  },
+  "openclaw": {
+    "extensions": ["./src/index.ts"]
+  },
+  "dependencies": {
+    "@3rd-eye-labs/openmm": "latest"
+  }
+}
