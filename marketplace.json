@@ -1,0 +1,22 @@
+{
+  "name": "openmm-ai",
+  "version": "0.1.0",
+  "description": "Open-source market making skills for AI agents",
+  "plugins": [
+    {
+      "name": "openmm-trading",
+      "path": "packages/plugins/openmm-trading",
+      "description": "Exchange setup, order management, and grid trading strategies",
+      "skills": ["exchange-setup", "grid-trading", "order-management"],
+      "agents": ["grid-trader"]
+    },
+    {
+      "name": "openmm-market-data",
+      "path": "packages/plugins/openmm-market-data",
+      "description": "Market data, portfolio tracking, and Cardano DEX integration",
+      "skills": ["portfolio", "cardano-dex"]
+    }
+  ],
+  "repository": "https://github.com/QBT-Labs/OpenMM-ai",
+  "license": "MIT"
+}
