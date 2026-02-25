@@ -8,12 +8,6 @@ const exec = promisify(execFile);
 // Helpers
 // ---------------------------------------------------------------------------
 
-/** Run an openmm CLI command and return stdout. */
-async function openmm(args: string[]): Promise<string> {
-  const { stdout } = await exec("openmm", args);
-  return stdout.trim();
-}
-
 /** Map plugin config keys to environment variables for the CLI. */
 function configToEnv(config: Record<string, unknown>): Record<string, string> {
   const map: Record<string, string> = {
@@ -48,6 +42,16 @@ function text(value: string) {
 // ---------------------------------------------------------------------------
 
 export default function register(api: any) {
+  const pluginConfig: Record<string, unknown> = api.pluginConfig ?? {};
+  const credentialEnv = configToEnv(pluginConfig);
+
+  /** Run an openmm CLI command with plugin credentials injected. */
+  async function openmm(args: string[]): Promise<string> {
+    const { stdout } = await exec("openmm", args, {
+      env: { ...process.env, ...credentialEnv },
+    });
+    return stdout.trim();
+  }
   // ------------------------------------------------------------------
   // Agent tools — invoked by the LLM during conversation
   // ------------------------------------------------------------------
@@ -242,36 +246,36 @@ export default function register(api: any) {
     { optional: true },
   );
 
-  // Stop grid strategy (optional)
+  // Stop grid strategy (optional) — cancels all open orders for the pair
   api.registerTool(
     {
       name: "openmm_grid_stop",
-      description: "Stop a running grid strategy and cancel all its open orders.",
+      description: "Stop a running grid strategy by cancelling all open orders for the trading pair.",
       parameters: Type.Object({
         exchange: Type.String({ description: "Exchange id" }),
         symbol: Type.String({ description: "Trading pair" }),
       }),
       async execute(_id: string, params: { exchange: string; symbol: string }) {
         return text(
-          await openmm(["trade", "--strategy", "grid", "--exchange", params.exchange, "--symbol", params.symbol, "--stop"]),
+          await openmm(["orders", "cancel-all", "--exchange", params.exchange, "--symbol", params.symbol]),
         );
       },
     },
     { optional: true },
   );
 
-  // Grid strategy status
+  // Grid strategy status — shows open orders and current price for the pair
   api.registerTool({
     name: "openmm_grid_status",
-    description: "Get the current status of a grid strategy including open orders, spread, and P&L.",
+    description: "Get the current status of a grid strategy by listing open orders and the current price for the pair.",
     parameters: Type.Object({
       exchange: Type.String({ description: "Exchange id" }),
       symbol: Type.String({ description: "Trading pair" }),
     }),
     async execute(_id: string, params: { exchange: string; symbol: string }) {
-      return text(
-        await openmm(["trade", "--strategy", "grid", "--exchange", params.exchange, "--symbol", params.symbol, "--status"]),
-      );
+      const orders = await openmm(["orders", "list", "--exchange", params.exchange, "--symbol", params.symbol]);
+      const ticker = await openmm(["ticker", "--exchange", params.exchange, "--symbol", params.symbol]);
+      return text(`Open Orders:\n${orders}\n\nCurrent Price:\n${ticker}`);
     },
   });
 
@@ -352,13 +356,9 @@ export default function register(api: any) {
       }
       const [exchange, symbol] = parts;
       try {
-        const result = await openmm([
-          "trade", "--strategy", "grid",
-          "--exchange", exchange,
-          "--symbol", symbol,
-          "--status",
-        ]);
-        return { text: result };
+        const orders = await openmm(["orders", "list", "--exchange", exchange, "--symbol", symbol]);
+        const ticker = await openmm(["ticker", "--exchange", exchange, "--symbol", symbol]);
+        return { text: `Open Orders:\n${orders}\n\nCurrent Price:\n${ticker}` };
       } catch (err: any) {
         return { text: `Error fetching strategy status: ${err.message}` };
       }
@@ -436,8 +436,8 @@ export default function register(api: any) {
   });
 
   api.registerCommand({
-    name: "cancel-all",
-    description: "Cancel all open orders. Usage: /cancel-all <exchange> [symbol]",
+    name: "cancelall",
+    description: "Cancel all open orders. Usage: /cancelall <exchange> [symbol]",
     acceptsArgs: true,
     requireAuth: true,
     handler: async (ctx: { args?: string }) => {
