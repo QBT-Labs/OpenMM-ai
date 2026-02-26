@@ -38,6 +38,144 @@ function text(value: string) {
 }
 
 // ---------------------------------------------------------------------------
+// Formatting helpers — turn raw JSON into readable Telegram messages
+// ---------------------------------------------------------------------------
+
+/** Extract and parse JSON from CLI output that may contain log lines. */
+function tryParseJson(raw: string): unknown | null {
+  // Try direct parse first (fast path)
+  try {
+    return JSON.parse(raw);
+  } catch {
+    // CLI may prefix JSON with log/info lines — find the first { or [
+    const objStart = raw.indexOf("{");
+    const arrStart = raw.indexOf("[");
+    let start = -1;
+    if (objStart >= 0 && arrStart >= 0) start = Math.min(objStart, arrStart);
+    else if (objStart >= 0) start = objStart;
+    else if (arrStart >= 0) start = arrStart;
+
+    if (start > 0) {
+      try {
+        return JSON.parse(raw.slice(start));
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  }
+}
+
+function formatBalance(raw: string, exchange: string): string {
+  const data = tryParseJson(raw);
+  if (!data || typeof data !== "object") return raw;
+
+  const entries = Object.values(data as Record<string, any>).filter(
+    (b: any) => b && typeof b.total === "number" && b.total > 0,
+  );
+  if (entries.length === 0) return `${exchange.toUpperCase()} Balance\n\nNo assets with balance found.`;
+
+  const lines = entries
+    .sort((a: any, b: any) => b.total - a.total)
+    .map((b: any) => {
+      const free = Number(b.free ?? 0);
+      const used = Number(b.used ?? 0);
+      const parts = [`  ${String(b.asset).padEnd(8)} ${formatNum(free)}`];
+      if (used > 0) parts[0] += `  (locked: ${formatNum(used)})`;
+      return parts[0];
+    });
+
+  return `${exchange.toUpperCase()} Balance\n\n${lines.join("\n")}`;
+}
+
+function formatTicker(raw: string, exchange: string, symbol: string): string {
+  const data = tryParseJson(raw);
+  if (!data || typeof data !== "object") return raw;
+
+  const t = data as any;
+  const spread = t.ask && t.bid ? ((t.ask - t.bid) / t.bid) * 100 : null;
+
+  const lines = [
+    `${symbol} on ${exchange.toUpperCase()}`,
+    "",
+    `  Price     ${formatNum(t.last)}`,
+    `  Bid       ${formatNum(t.bid)}`,
+    `  Ask       ${formatNum(t.ask)}`,
+  ];
+  if (spread !== null) lines.push(`  Spread    ${spread.toFixed(3)}%`);
+  if (t.baseVolume) lines.push(`  Vol 24h   ${formatNum(t.baseVolume)}`);
+
+  return lines.join("\n");
+}
+
+function formatOrderbook(raw: string): string {
+  const data = tryParseJson(raw);
+  if (!data || typeof data !== "object") return raw;
+
+  const ob = data as any;
+  const bids: any[] = ob.bids ?? [];
+  const asks: any[] = ob.asks ?? [];
+
+  const fmtLevel = (e: any) => `  ${formatNum(e.price).padStart(14)}  ${formatNum(e.amount)}`;
+
+  const lines = [`${ob.symbol ?? ""} Order Book`, ""];
+  if (asks.length > 0) {
+    lines.push("  Asks (sell)");
+    for (const a of [...asks].reverse().slice(0, 10)) lines.push(fmtLevel(a));
+    lines.push("  ──────────────────────");
+  }
+  if (bids.length > 0) {
+    lines.push("  Bids (buy)");
+    for (const b of bids.slice(0, 10)) lines.push(fmtLevel(b));
+  }
+
+  return lines.join("\n");
+}
+
+function formatOrders(raw: string): string {
+  const data = tryParseJson(raw);
+  if (!Array.isArray(data)) return raw;
+  if (data.length === 0) return "No open orders.";
+
+  const lines = [`Open Orders (${data.length})`, ""];
+  for (const o of data) {
+    const side = (o.side ?? "").toUpperCase();
+    const filled = o.filled ? ` filled: ${formatNum(o.filled)}` : "";
+    lines.push(`  ${side} ${formatNum(o.amount)} ${o.symbol} @ ${formatNum(o.price)}${filled}`);
+    lines.push(`  ID: ${o.id}  Status: ${o.status ?? "open"}`);
+    lines.push("");
+  }
+
+  return lines.join("\n").trimEnd();
+}
+
+function formatTrades(raw: string): string {
+  const data = tryParseJson(raw);
+  if (!Array.isArray(data)) return raw;
+  if (data.length === 0) return "No recent trades.";
+
+  const lines = [`Recent Trades (${data.length})`, ""];
+  for (const t of data.slice(0, 20)) {
+    const side = (t.side ?? "").toUpperCase();
+    const time = t.timestamp ? new Date(t.timestamp).toLocaleTimeString() : "";
+    lines.push(`  ${side.padEnd(4)} ${formatNum(t.amount)} @ ${formatNum(t.price)}  ${time}`);
+  }
+
+  return lines.join("\n");
+}
+
+function formatNum(val: unknown): string {
+  if (val == null) return "-";
+  const n = Number(val);
+  if (isNaN(n)) return String(val);
+  if (n === 0) return "0";
+  if (Math.abs(n) >= 1000) return n.toLocaleString("en-US", { maximumFractionDigits: 2 });
+  if (Math.abs(n) >= 1) return n.toLocaleString("en-US", { maximumFractionDigits: 6 });
+  // Small numbers — show up to 8 significant digits
+  return n.toPrecision(Math.min(8, Math.max(2, -Math.floor(Math.log10(Math.abs(n))) + 4)));
+}
+
+// ---------------------------------------------------------------------------
 // Plugin entry
 // ---------------------------------------------------------------------------
 
@@ -319,7 +457,7 @@ export default function register(api: any) {
       const exchange = ctx.args?.trim() || "mexc";
       try {
         const result = await openmm(["balance", "--exchange", exchange, "--json"]);
-        return { text: result };
+        return { text: formatBalance(result, exchange) };
       } catch (err: any) {
         return { text: `Error checking balance: ${err.message}` };
       }
@@ -337,8 +475,8 @@ export default function register(api: any) {
       }
       const [exchange, symbol] = parts;
       try {
-        const result = await openmm(["ticker", "--exchange", exchange, "--symbol", symbol]);
-        return { text: result };
+        const result = await openmm(["ticker", "--exchange", exchange, "--symbol", symbol, "--json"]);
+        return { text: formatTicker(result, exchange, symbol) };
       } catch (err: any) {
         return { text: `Error fetching price: ${err.message}` };
       }
@@ -356,9 +494,11 @@ export default function register(api: any) {
       }
       const [exchange, symbol] = parts;
       try {
-        const orders = await openmm(["orders", "list", "--exchange", exchange, "--symbol", symbol]);
-        const ticker = await openmm(["ticker", "--exchange", exchange, "--symbol", symbol]);
-        return { text: `Open Orders:\n${orders}\n\nCurrent Price:\n${ticker}` };
+        const ordersRaw = await openmm(["orders", "list", "--exchange", exchange, "--symbol", symbol, "--json"]);
+        const tickerRaw = await openmm(["ticker", "--exchange", exchange, "--symbol", symbol, "--json"]);
+        const ordersFormatted = formatOrders(ordersRaw);
+        const tickerFormatted = formatTicker(tickerRaw, exchange, symbol);
+        return { text: `Strategy Status\n\n${tickerFormatted}\n\n${ordersFormatted}` };
       } catch (err: any) {
         return { text: `Error fetching strategy status: ${err.message}` };
       }
@@ -372,8 +512,8 @@ export default function register(api: any) {
     handler: async (ctx: { args?: string }) => {
       const exchange = ctx.args?.trim() || "mexc";
       try {
-        const result = await openmm(["orders", "list", "--exchange", exchange]);
-        return { text: result };
+        const result = await openmm(["orders", "list", "--exchange", exchange, "--json"]);
+        return { text: formatOrders(result) };
       } catch (err: any) {
         return { text: `Error listing orders: ${err.message}` };
       }
@@ -391,8 +531,8 @@ export default function register(api: any) {
       }
       const [exchange, symbol] = parts;
       try {
-        const result = await openmm(["orderbook", "--exchange", exchange, "--symbol", symbol, "--limit", "10"]);
-        return { text: result };
+        const result = await openmm(["orderbook", "--exchange", exchange, "--symbol", symbol, "--limit", "10", "--json"]);
+        return { text: formatOrderbook(result) };
       } catch (err: any) {
         return { text: `Error fetching orderbook: ${err.message}` };
       }
@@ -443,7 +583,7 @@ export default function register(api: any) {
     handler: async (ctx: { args?: string }) => {
       const parts = ctx.args?.trim().split(/\s+/) || [];
       if (parts.length < 1 || !parts[0]) {
-        return { text: "Usage: /cancel-all <exchange> [symbol]\nExample: /cancel-all mexc SNEK/USDT" };
+        return { text: "Usage: /cancelall <exchange> [symbol]\nExample: /cancelall mexc SNEK/USDT" };
       }
       const [exchange, symbol] = parts;
       try {

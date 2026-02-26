@@ -4,13 +4,15 @@
   "private": true,
   "description": "Open-source market making skills for AI agents",
   "workspaces": [
-    "packages/plugins/*"
+    "packages/plugins/*",
+    "packages/openmm-skills"
   ],
   "scripts": {
     "publish:trading": "npm publish --workspace=@qbtlabs/openmm-trading --access=public",
     "publish:market-data": "npm publish --workspace=@qbtlabs/openmm-market-data --access=public",
     "publish:openclaw": "npm publish --workspace=@qbtlabs/openclaw-openmm --access=public",
-    "publish:all": "npm run publish:trading && npm run publish:market-data && npm run publish:openclaw",
+    "publish:skills": "npm publish --workspace=@qbtlabs/openmm-skills --access=public",
+    "publish:all": "npm run publish:trading && npm run publish:market-data && npm run publish:openclaw && npm run publish:skills",
     "typecheck": "npm run --workspace=@qbtlabs/openclaw-openmm typecheck",
     "version:patch": "npm version patch --workspaces --no-git-tag-version",
     "version:minor": "npm version minor --workspaces --no-git-tag-version"

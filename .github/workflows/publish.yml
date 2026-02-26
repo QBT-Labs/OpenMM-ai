@@ -37,3 +37,8 @@ jobs:
         run: npm run publish:openclaw
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish @qbtlabs/openmm-skills
+        run: npm run publish:skills
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

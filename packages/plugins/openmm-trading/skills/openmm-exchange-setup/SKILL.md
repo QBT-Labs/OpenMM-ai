@@ -1,9 +1,11 @@
 ---
 name: openmm-exchange-setup
-version: 0.1.0
 description: "Step-by-step guide to configure exchange API credentials for OpenMM."
-tags: [openmm, setup, exchanges, configuration]
+allowed-tools: Read, Glob, Grep, Bash(openmm:*)
+license: MIT
 metadata:
+  author: qbtlabs
+  version: '0.1.1'
   openclaw:
     emoji: "🔑"
     requires:
@@ -73,7 +75,7 @@ Required permissions for each exchange:
 - Trade
 - Read Only
 - No Transfer permission
-- Note the Passphrase — it is set when creating the API key
+- Note the Passphrase -- it is set when creating the API key
 
 ### Step 3: Set Environment Variables
 
@@ -187,8 +189,8 @@ Only include env vars for exchanges you want to use.
 
 ## Security Best Practices
 
-1. **Never enable withdrawals** — trading doesn't need it
-2. **Use IP whitelisting** — restrict to your server's IP
-3. **Never commit `.env` files** — add `.env` to `.gitignore`
-4. **Rotate keys periodically** — every 90 days recommended
-5. **Use separate keys for testing** — don't mix testnet/mainnet
+1. **Never enable withdrawals** -- trading doesn't need it
+2. **Use IP whitelisting** -- restrict to your server's IP
+3. **Never commit `.env` files** -- add `.env` to `.gitignore`
+4. **Rotate keys periodically** -- every 90 days recommended
+5. **Use separate keys for testing** -- don't mix testnet/mainnet

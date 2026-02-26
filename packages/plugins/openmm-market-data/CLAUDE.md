@@ -27,8 +27,8 @@ The following actions are **out of scope** for this plugin:
 
 | Skill | File | Description |
 |-------|------|-------------|
-| `openmm-portfolio` | `skills/portfolio.md` | Balance tracking, order overview, market data |
-| `openmm-cardano-dex` | `skills/cardano-dex.md` | Cardano DEX pricing and pool discovery |
+| `openmm-portfolio` | `skills/openmm-portfolio/SKILL.md` | Balance tracking, order overview, market data |
+| `openmm-cardano-dex` | `skills/openmm-cardano-dex/SKILL.md` | Cardano DEX pricing and pool discovery |
 
 ## Reference Files
 

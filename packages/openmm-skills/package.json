@@ -1,0 +1,17 @@
+{
+  "name": "@qbtlabs/openmm-skills",
+  "version": "0.1.1",
+  "description": "Install OpenMM skills for AI agents — market making, grid trading, and Cardano DEX integration",
+  "keywords": ["openmm", "skills", "trading", "market-making", "ai-agents", "grid", "cardano"],
+  "type": "module",
+  "bin": {
+    "openmm-skills": "./bin/openmm-skills.mjs"
+  },
+  "files": ["bin"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/QBT-Labs/OpenMM-ai.git",
+    "directory": "packages/openmm-skills"
+  }
+}

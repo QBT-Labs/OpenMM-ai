@@ -1,0 +1,29 @@
+{
+  "name": "openmm-ai",
+  "version": "1.0.0",
+  "owner": {
+    "name": "QBT Labs",
+    "email": "contact@qbtlabs.com"
+  },
+  "metadata": {
+    "description": "Open-source market making skills, plugins, and agents for multi-exchange trading. Supports MEXC, Gate.io, Kraken, and Bitget with grid strategies and Cardano DEX integration.",
+    "repository": "https://github.com/QBT-Labs/OpenMM-ai"
+  },
+  "plugins": [
+    {
+      "name": "openmm-trading",
+      "source": "./packages/plugins/openmm-trading",
+      "description": "Exchange setup, order management, and grid trading strategies for OpenMM"
+    },
+    {
+      "name": "openmm-market-data",
+      "source": "./packages/plugins/openmm-market-data",
+      "description": "Market data, portfolio tracking, and Cardano DEX integration for OpenMM"
+    },
+    {
+      "name": "openclaw-openmm",
+      "source": "./packages/plugins/openclaw-openmm",
+      "description": "OpenClaw plugin for Telegram and other channels — trade, monitor, and manage strategies"
+    }
+  ]
+}

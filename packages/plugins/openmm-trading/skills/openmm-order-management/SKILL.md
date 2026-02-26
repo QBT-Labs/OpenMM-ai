@@ -1,9 +1,11 @@
 ---
 name: openmm-order-management
-version: 0.1.0
 description: "Place, list, and cancel limit/market orders on supported exchanges with OpenMM."
-tags: [openmm, orders, trading, limit, market]
+allowed-tools: Read, Glob, Grep, Bash(openmm:*)
+license: MIT
 metadata:
+  author: qbtlabs
+  version: '0.1.1'
   openclaw:
     emoji: "📋"
     requires:

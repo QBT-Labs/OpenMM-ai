@@ -1,9 +1,11 @@
 ---
 name: openmm-cardano-dex
-version: 0.1.0
 description: "Cardano DEX pool discovery, aggregated pricing, and DEX vs CEX comparison via Iris Protocol."
-tags: [openmm, cardano, dex, pools, iris, pricing]
+allowed-tools: Read, Glob, Grep, Bash(openmm:*)
+license: MIT
 metadata:
+  author: qbtlabs
+  version: '0.1.1'
   openclaw:
     emoji: "🏊"
     requires:
@@ -28,7 +30,7 @@ OpenMM integrates with Cardano DEX liquidity pools via the **Iris Protocol**, ag
 
 ## Credentials
 
-No exchange API keys are required for Cardano DEX operations — all pool data is public on-chain. However, the `price-comparison` command also fetches CEX prices, which may require exchange credentials to be configured. See the [portfolio](portfolio.md) skill for exchange credential setup.
+No exchange API keys are required for Cardano DEX operations — all pool data is public on-chain. However, the `price-comparison` command also fetches CEX prices, which may require exchange credentials to be configured. See the **openmm-portfolio** skill for exchange credential setup.
 
 ## Aggregated DEX Pricing
 

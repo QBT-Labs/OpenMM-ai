@@ -1,9 +1,11 @@
 ---
 name: openmm-grid-trading
-version: 0.1.0
 description: "Create and manage grid trading strategies with OpenMM. Automated buy/sell around center price."
-tags: [openmm, grid, trading, strategy, automation]
+allowed-tools: Read, Glob, Grep, Bash(openmm:*)
+license: MIT
 metadata:
+  author: qbtlabs
+  version: '0.1.1'
   openclaw:
     emoji: "📊"
     requires:
