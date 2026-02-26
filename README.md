@@ -3,6 +3,7 @@
 > Open-source market making skills for AI agents
 
 [![npm](https://img.shields.io/npm/v/@3rd-eye-labs/openmm)](https://www.npmjs.com/package/@3rd-eye-labs/openmm)
+[![openmm-skills](https://img.shields.io/npm/v/@qbtlabs/openmm-skills?label=openmm-skills)](https://www.npmjs.com/package/@qbtlabs/openmm-skills)
 [![openmm-trading](https://img.shields.io/npm/v/@qbtlabs/openmm-trading?label=openmm-trading)](https://www.npmjs.com/package/@qbtlabs/openmm-trading)
 [![openmm-market-data](https://img.shields.io/npm/v/@qbtlabs/openmm-market-data?label=openmm-market-data)](https://www.npmjs.com/package/@qbtlabs/openmm-market-data)
 [![openclaw-openmm](https://img.shields.io/npm/v/@qbtlabs/openclaw-openmm?label=openclaw-openmm)](https://www.npmjs.com/package/@qbtlabs/openclaw-openmm)
@@ -15,9 +16,72 @@ Built on the open [Agent Skills](https://agentskills.io/home) standard — a por
 
 ---
 
-## Install
+## Install Skills
 
-### Install a skill (OpenClaw / ClawHub)
+### Quick Install (all skills)
+
+```bash
+npx @qbtlabs/openmm-skills --all
+```
+
+### Interactive Install
+
+```bash
+npx @qbtlabs/openmm-skills
+```
+
+```
+ ██████╗ ██████╗ ███████╗███╗   ██╗███╗   ███╗███╗   ███╗
+██╔═══██╗██╔══██╗██╔════╝████╗  ██║████╗ ████║████╗ ████║
+██║   ██║██████╔╝█████╗  ██╔██╗ ██║██╔████╔██║██╔████╔██║
+██║   ██║██╔═══╝ ██╔══╝  ██║╚██╗██║██║╚██╔╝██║██║╚██╔╝██║
+╚██████╔╝██║     ███████╗██║ ╚████║██║ ╚═╝ ██║██║ ╚═╝ ██║
+ ╚═════╝ ╚═╝     ╚══════╝╚═╝  ╚═══╝╚═╝     ╚═╝╚═╝     ╚═╝
+
+  QBT Labs  — Open-source market making for AI agents
+
+  Found 5 skills
+
+  Select skills to install (space to toggle)
+    □ openmm-exchange-setup
+    □ openmm-grid-trading
+    □ openmm-order-management
+    □ openmm-cardano-dex
+    □ openmm-portfolio
+```
+
+### Browse Available Skills
+
+```bash
+npx @qbtlabs/openmm-skills --list
+```
+
+### Install a Specific Skill
+
+```bash
+npx @qbtlabs/openmm-skills --skill openmm-grid-trading
+```
+
+### Install to a Specific Agent
+
+```bash
+npx @qbtlabs/openmm-skills --agent claude-code
+npx @qbtlabs/openmm-skills --agent cursor
+```
+
+### Install Globally (user-level)
+
+```bash
+npx @qbtlabs/openmm-skills --global
+```
+
+### Alternative: Standard Skills CLI
+
+```bash
+npx skills add QBT-Labs/OpenMM-ai
+```
+
+### Alternative: ClawHub
 
 ```bash
 clawhub install openmm-exchange-setup
@@ -25,55 +89,17 @@ clawhub install openmm-grid-trading
 clawhub install openmm-portfolio
 ```
 
-### Install a skill (agents)
-
-Point your agent at the raw skill URL:
-
-```
-https://raw.githubusercontent.com/QBT-Labs/OpenMM-ai/main/SKILL.md
-https://raw.githubusercontent.com/QBT-Labs/OpenMM-ai/main/skills/exchange-setup/SKILL.md
-https://raw.githubusercontent.com/QBT-Labs/OpenMM-ai/main/skills/grid-trading/SKILL.md
-https://raw.githubusercontent.com/QBT-Labs/OpenMM-ai/main/skills/portfolio/SKILL.md
-```
-
 ---
 
 ## Skills
 
-| Skill | What it does | Install |
-|-------|-------------|---------|
-| **[OpenMM (Core)](#openmm-core)** | Full CLI, MCP, and library reference for multi-exchange market making | [`SKILL.md`](SKILL.md) |
-| **[Exchange Setup](#exchange-setup)** | Step-by-step guide to configure exchange API credentials | [`SKILL.md`](skills/exchange-setup/SKILL.md) |
-| **[Grid Trading](#grid-trading)** | Create and manage automated grid trading strategies | [`SKILL.md`](skills/grid-trading/SKILL.md) |
-| **[Portfolio](#portfolio)** | Balance tracking, order overview, and market data across exchanges | [`SKILL.md`](skills/portfolio/SKILL.md) |
-
----
-
-## Skill details
-
-### OpenMM (Core)
-
-The main skill — covers everything an agent needs to use OpenMM. Balance checks, market data, order management, grid trading, Cardano pool discovery, and safety rules. Includes full CLI reference and all 13 MCP tool mappings.
-
-**[Download SKILL.md](SKILL.md)**
-
-### Exchange Setup
-
-Step-by-step guide to configure exchange API credentials via environment variables. Covers MEXC, Gate.io, Kraken, and Bitget. Includes permission setup, MCP server config, troubleshooting, and security best practices.
-
-**[Download SKILL.md](skills/exchange-setup/SKILL.md)**
-
-### Grid Trading
-
-Create automated grid strategies that profit from market volatility. Linear and geometric spacing, flat and pyramidal sizing, volatility-based spread adjustment, grid profiles, and risk management.
-
-**[Download SKILL.md](skills/grid-trading/SKILL.md)**
-
-### Portfolio
-
-Track balances and open orders across exchanges, check market prices, compare DEX vs CEX prices for Cardano tokens, and discover liquidity pools.
-
-**[Download SKILL.md](skills/portfolio/SKILL.md)**
+| Skill | Description |
+|-------|-------------|
+| **openmm-portfolio** | Balance tracking, order overview, and market data across exchanges |
+| **openmm-exchange-setup** | Step-by-step guide to configure exchange API credentials |
+| **openmm-grid-trading** | Automated grid trading strategies with dry-run support |
+| **openmm-order-management** | Place, list, and cancel limit/market orders |
+| **openmm-cardano-dex** | Cardano DEX pool discovery and aggregated pricing via Iris Protocol |
 
 ---
 
@@ -81,17 +107,42 @@ Track balances and open orders across exchanges, check market prices, compare DE
 
 Self-contained plugin packages for structured agent integration:
 
-| Plugin | What it does | Path |
-|--------|-------------|------|
-| **[openmm-trading](packages/plugins/openmm-trading)** | Exchange setup, order management, and grid trading strategies | `packages/plugins/openmm-trading` |
-| **[openmm-market-data](packages/plugins/openmm-market-data)** | Market data, portfolio tracking, and Cardano DEX integration | `packages/plugins/openmm-market-data` |
-| **[openclaw-openmm](packages/plugins/openclaw-openmm)** | OpenClaw plugin — agent tools and commands for Telegram/Discord | `packages/plugins/openclaw-openmm` |
+| Plugin | Description | npm |
+|--------|-------------|-----|
+| **[openmm-trading](packages/plugins/openmm-trading)** | Exchange setup, order management, and grid trading strategies | [`@qbtlabs/openmm-trading`](https://www.npmjs.com/package/@qbtlabs/openmm-trading) |
+| **[openmm-market-data](packages/plugins/openmm-market-data)** | Market data, portfolio tracking, and Cardano DEX integration | [`@qbtlabs/openmm-market-data`](https://www.npmjs.com/package/@qbtlabs/openmm-market-data) |
+| **[openclaw-openmm](packages/plugins/openclaw-openmm)** | OpenClaw plugin — trade and monitor from Telegram or any channel | [`@qbtlabs/openclaw-openmm`](https://www.npmjs.com/package/@qbtlabs/openclaw-openmm) |
 
-### Install a plugin (OpenClaw)
+### Install the OpenClaw Plugin
 
 ```bash
 openclaw plugins install @qbtlabs/openclaw-openmm
 ```
+
+---
+
+## Prerequisites
+
+```bash
+npm install -g @3rd-eye-labs/openmm
+```
+
+Verify the installation:
+
+```bash
+which openmm
+```
+
+---
+
+## Supported Exchanges
+
+| Exchange | Min Order | Credentials |
+|----------|-----------|-------------|
+| MEXC | 1 USDT | `MEXC_API_KEY`, `MEXC_SECRET` |
+| Gate.io | 1 USDT | `GATEIO_API_KEY`, `GATEIO_SECRET` |
+| Bitget | 1 USDT | `BITGET_API_KEY`, `BITGET_SECRET`, `BITGET_PASSPHRASE` |
+| Kraken | 5 EUR/USD | `KRAKEN_API_KEY`, `KRAKEN_SECRET` |
 
 ---
 
@@ -102,11 +153,14 @@ OpenMM Ecosystem
 ├── OpenMM (Core)           → github.com/3rd-Eye-Labs/OpenMM
 ├── OpenMM-MCP (Tools)      → github.com/QBT-Labs/OpenMM-MCP
 └── OpenMM-AI (Skills)      → this repo
-    ├── skills/             → flat skill files (Agent Skills standard)
-    └── packages/plugins/   → structured plugin packages
+    ├── .claude-plugin/     → plugin discovery manifest
+    └── packages/
+        ├── openmm-skills/  → npx installer with OpenMM banner
+        └── plugins/
+            ├── openmm-trading/       → trading skills + references
+            ├── openmm-market-data/   → market data skills + references
+            └── openclaw-openmm/      → OpenClaw plugin (Telegram, Discord)
 ```
-
-Each skill folder is self-contained — `SKILL.md` has the core instructions an agent needs. Plugins bundle related skills with references, agents, and OpenClaw integration.
 
 **x402 (coming soon)** — Payment layer for AI agent transactions is a work in progress.
 
