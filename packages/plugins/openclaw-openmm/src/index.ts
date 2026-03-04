@@ -1,6 +1,21 @@
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { Type } from "@sinclair/typebox";
+import {
+  plainAdapter,
+  formatBalance,
+  formatTicker,
+  formatOrderbook,
+  formatOrders,
+  formatTrades,
+  formatError,
+  type FormatAdapter,
+  type BalanceEntry,
+  type TickerData,
+  type OrderbookData,
+  type OrderData,
+  type TradeData,
+} from "@qbtlabs/shared";
 
 const exec = promisify(execFile);
 
@@ -38,7 +53,7 @@ function text(value: string) {
 }
 
 // ---------------------------------------------------------------------------
-// Formatting helpers — turn raw JSON into readable Telegram messages
+// JSON parsing — strip CLI log lines before JSON payload
 // ---------------------------------------------------------------------------
 
 /** Extract and parse JSON from CLI output that may contain log lines. */
@@ -66,113 +81,85 @@ function tryParseJson(raw: string): unknown | null {
   }
 }
 
-function formatBalance(raw: string, exchange: string): string {
+// ---------------------------------------------------------------------------
+// Data parsers — convert raw JSON to typed data for shared formatters
+// ---------------------------------------------------------------------------
+
+function parseBalance(raw: string): BalanceEntry[] {
   const data = tryParseJson(raw);
-  if (!data || typeof data !== "object") return raw;
+  if (!data || typeof data !== "object") return [];
 
-  const entries = Object.values(data as Record<string, any>).filter(
-    (b: any) => b && typeof b.total === "number" && b.total > 0,
-  );
-  if (entries.length === 0) return `${exchange.toUpperCase()} Balance\n\nNo assets with balance found.`;
-
-  const lines = entries
-    .sort((a: any, b: any) => b.total - a.total)
-    .map((b: any) => {
-      const free = Number(b.free ?? 0);
-      const used = Number(b.used ?? 0);
-      const parts = [`  ${String(b.asset).padEnd(8)} ${formatNum(free)}`];
-      if (used > 0) parts[0] += `  (locked: ${formatNum(used)})`;
-      return parts[0];
-    });
-
-  return `${exchange.toUpperCase()} Balance\n\n${lines.join("\n")}`;
+  return Object.values(data as Record<string, any>)
+    .filter((b: any) => b && typeof b.total === "number" && b.total > 0)
+    .map((b: any) => ({
+      asset: String(b.asset ?? ""),
+      free: Number(b.free ?? 0),
+      used: Number(b.used ?? 0),
+      total: Number(b.total ?? 0),
+    }));
 }
 
-function formatTicker(raw: string, exchange: string, symbol: string): string {
+function parseTicker(raw: string, exchange: string, symbol: string): TickerData | null {
   const data = tryParseJson(raw);
-  if (!data || typeof data !== "object") return raw;
-
+  if (!data || typeof data !== "object") return null;
   const t = data as any;
-  const spread = t.ask && t.bid ? ((t.ask - t.bid) / t.bid) * 100 : null;
-
-  const lines = [
-    `${symbol} on ${exchange.toUpperCase()}`,
-    "",
-    `  Price     ${formatNum(t.last)}`,
-    `  Bid       ${formatNum(t.bid)}`,
-    `  Ask       ${formatNum(t.ask)}`,
-  ];
-  if (spread !== null) lines.push(`  Spread    ${spread.toFixed(3)}%`);
-  if (t.baseVolume) lines.push(`  Vol 24h   ${formatNum(t.baseVolume)}`);
-
-  return lines.join("\n");
+  return {
+    symbol,
+    exchange,
+    last: Number(t.last ?? 0),
+    bid: Number(t.bid ?? 0),
+    ask: Number(t.ask ?? 0),
+    baseVolume: t.baseVolume ? Number(t.baseVolume) : undefined,
+  };
 }
 
-function formatOrderbook(raw: string): string {
+function parseOrderbook(raw: string): OrderbookData | null {
   const data = tryParseJson(raw);
-  if (!data || typeof data !== "object") return raw;
-
+  if (!data || typeof data !== "object") return null;
   const ob = data as any;
-  const bids: any[] = ob.bids ?? [];
-  const asks: any[] = ob.asks ?? [];
-
-  const fmtLevel = (e: any) => `  ${formatNum(e.price).padStart(14)}  ${formatNum(e.amount)}`;
-
-  const lines = [`${ob.symbol ?? ""} Order Book`, ""];
-  if (asks.length > 0) {
-    lines.push("  Asks (sell)");
-    for (const a of [...asks].reverse().slice(0, 10)) lines.push(fmtLevel(a));
-    lines.push("  ──────────────────────");
-  }
-  if (bids.length > 0) {
-    lines.push("  Bids (buy)");
-    for (const b of bids.slice(0, 10)) lines.push(fmtLevel(b));
-  }
-
-  return lines.join("\n");
+  return {
+    symbol: ob.symbol ?? undefined,
+    bids: (ob.bids ?? []).map((e: any) => ({ price: Number(e.price), amount: Number(e.amount) })),
+    asks: (ob.asks ?? []).map((e: any) => ({ price: Number(e.price), amount: Number(e.amount) })),
+  };
 }
 
-function formatOrders(raw: string): string {
+function parseOrders(raw: string): OrderData[] {
   const data = tryParseJson(raw);
-  if (!Array.isArray(data)) return raw;
-  if (data.length === 0) return "No open orders.";
-
-  const lines = [`Open Orders (${data.length})`, ""];
-  for (const o of data) {
-    const side = (o.side ?? "").toUpperCase();
-    const filled = o.filled ? ` filled: ${formatNum(o.filled)}` : "";
-    lines.push(`  ${side} ${formatNum(o.amount)} ${o.symbol} @ ${formatNum(o.price)}${filled}`);
-    lines.push(`  ID: ${o.id}  Status: ${o.status ?? "open"}`);
-    lines.push("");
-  }
-
-  return lines.join("\n").trimEnd();
+  if (!Array.isArray(data)) return [];
+  return data.map((o: any) => ({
+    id: String(o.id ?? ""),
+    symbol: String(o.symbol ?? ""),
+    side: String(o.side ?? ""),
+    type: String(o.type ?? ""),
+    amount: Number(o.amount ?? 0),
+    price: Number(o.price ?? 0),
+    filled: o.filled ? Number(o.filled) : undefined,
+    status: o.status ? String(o.status) : undefined,
+  }));
 }
 
-function formatTrades(raw: string): string {
+function parseTrades(raw: string): TradeData[] {
   const data = tryParseJson(raw);
-  if (!Array.isArray(data)) return raw;
-  if (data.length === 0) return "No recent trades.";
-
-  const lines = [`Recent Trades (${data.length})`, ""];
-  for (const t of data.slice(0, 20)) {
-    const side = (t.side ?? "").toUpperCase();
-    const time = t.timestamp ? new Date(t.timestamp).toLocaleTimeString() : "";
-    lines.push(`  ${side.padEnd(4)} ${formatNum(t.amount)} @ ${formatNum(t.price)}  ${time}`);
-  }
-
-  return lines.join("\n");
+  if (!Array.isArray(data)) return [];
+  return data.map((t: any) => ({
+    side: String(t.side ?? ""),
+    amount: Number(t.amount ?? 0),
+    price: Number(t.price ?? 0),
+    timestamp: t.timestamp ? Number(t.timestamp) : undefined,
+  }));
 }
 
-function formatNum(val: unknown): string {
-  if (val == null) return "-";
-  const n = Number(val);
-  if (isNaN(n)) return String(val);
-  if (n === 0) return "0";
-  if (Math.abs(n) >= 1000) return n.toLocaleString("en-US", { maximumFractionDigits: 2 });
-  if (Math.abs(n) >= 1) return n.toLocaleString("en-US", { maximumFractionDigits: 6 });
-  // Small numbers — show up to 8 significant digits
-  return n.toPrecision(Math.min(8, Math.max(2, -Math.floor(Math.log10(Math.abs(n))) + 4)));
+// ---------------------------------------------------------------------------
+// Adapter resolution — pick the right adapter based on platform context
+// ---------------------------------------------------------------------------
+
+/** Resolve the format adapter for the current platform. Defaults to plain. */
+function getAdapter(_api: any): FormatAdapter {
+  // OpenClaw exposes the platform via api.platform or context.
+  // For now, default to plain — the LLM reads tool results as plain text.
+  // Auto-reply commands can pass the adapter explicitly.
+  return plainAdapter;
 }
 
 // ---------------------------------------------------------------------------
@@ -190,6 +177,9 @@ export default function register(api: any) {
     });
     return stdout.trim();
   }
+
+  const adapter = getAdapter(api);
+
   // ------------------------------------------------------------------
   // Agent tools — invoked by the LLM during conversation
   // ------------------------------------------------------------------
@@ -411,9 +401,17 @@ export default function register(api: any) {
       symbol: Type.String({ description: "Trading pair" }),
     }),
     async execute(_id: string, params: { exchange: string; symbol: string }) {
-      const orders = await openmm(["orders", "list", "--exchange", params.exchange, "--symbol", params.symbol]);
-      const ticker = await openmm(["ticker", "--exchange", params.exchange, "--symbol", params.symbol]);
-      return text(`Open Orders:\n${orders}\n\nCurrent Price:\n${ticker}`);
+      const ordersRaw = await openmm(["orders", "list", "--exchange", params.exchange, "--symbol", params.symbol]);
+      const tickerRaw = await openmm(["ticker", "--exchange", params.exchange, "--symbol", params.symbol]);
+
+      const ordersParsed = parseOrders(ordersRaw);
+      const tickerParsed = parseTicker(tickerRaw, params.exchange, params.symbol);
+
+      const parts: string[] = [];
+      if (tickerParsed) parts.push(formatTicker(adapter, tickerParsed));
+      parts.push(formatOrders(adapter, ordersParsed));
+
+      return text(parts.join("\n\n"));
     },
   });
 
@@ -457,9 +455,10 @@ export default function register(api: any) {
       const exchange = ctx.args?.trim() || "mexc";
       try {
         const result = await openmm(["balance", "--exchange", exchange, "--json"]);
-        return { text: formatBalance(result, exchange) };
+        const entries = parseBalance(result);
+        return { text: formatBalance(adapter, entries, exchange) };
       } catch (err: any) {
-        return { text: `Error checking balance: ${err.message}` };
+        return { text: formatError(adapter, { message: err.message, code: "BALANCE_ERROR" }) };
       }
     },
   });
@@ -476,9 +475,11 @@ export default function register(api: any) {
       const [exchange, symbol] = parts;
       try {
         const result = await openmm(["ticker", "--exchange", exchange, "--symbol", symbol, "--json"]);
-        return { text: formatTicker(result, exchange, symbol) };
+        const ticker = parseTicker(result, exchange, symbol);
+        if (!ticker) return { text: result };
+        return { text: formatTicker(adapter, ticker) };
       } catch (err: any) {
-        return { text: `Error fetching price: ${err.message}` };
+        return { text: formatError(adapter, { message: err.message, code: "TICKER_ERROR" }) };
       }
     },
   });
@@ -496,11 +497,13 @@ export default function register(api: any) {
       try {
         const ordersRaw = await openmm(["orders", "list", "--exchange", exchange, "--symbol", symbol, "--json"]);
         const tickerRaw = await openmm(["ticker", "--exchange", exchange, "--symbol", symbol, "--json"]);
-        const ordersFormatted = formatOrders(ordersRaw);
-        const tickerFormatted = formatTicker(tickerRaw, exchange, symbol);
-        return { text: `Strategy Status\n\n${tickerFormatted}\n\n${ordersFormatted}` };
+        const ticker = parseTicker(tickerRaw, exchange, symbol);
+        const orders = parseOrders(ordersRaw);
+        const tickerStr = ticker ? formatTicker(adapter, ticker) : "";
+        const ordersStr = formatOrders(adapter, orders);
+        return { text: `${adapter.header("Strategy Status")}\n\n${tickerStr}\n\n${ordersStr}` };
       } catch (err: any) {
-        return { text: `Error fetching strategy status: ${err.message}` };
+        return { text: formatError(adapter, { message: err.message, code: "STRATEGY_ERROR" }) };
       }
     },
   });
@@ -513,9 +516,9 @@ export default function register(api: any) {
       const exchange = ctx.args?.trim() || "mexc";
       try {
         const result = await openmm(["orders", "list", "--exchange", exchange, "--json"]);
-        return { text: formatOrders(result) };
+        return { text: formatOrders(adapter, parseOrders(result)) };
       } catch (err: any) {
-        return { text: `Error listing orders: ${err.message}` };
+        return { text: formatError(adapter, { message: err.message, code: "ORDERS_ERROR" }) };
       }
     },
   });
@@ -532,9 +535,11 @@ export default function register(api: any) {
       const [exchange, symbol] = parts;
       try {
         const result = await openmm(["orderbook", "--exchange", exchange, "--symbol", symbol, "--limit", "10", "--json"]);
-        return { text: formatOrderbook(result) };
+        const ob = parseOrderbook(result);
+        if (!ob) return { text: result };
+        return { text: formatOrderbook(adapter, ob) };
       } catch (err: any) {
-        return { text: `Error fetching orderbook: ${err.message}` };
+        return { text: formatError(adapter, { message: err.message, code: "ORDERBOOK_ERROR" }) };
       }
     },
   });
@@ -552,7 +557,7 @@ export default function register(api: any) {
         const result = await openmm(["pool-discovery", "discover", token]);
         return { text: result };
       } catch (err: any) {
-        return { text: `Error discovering pools: ${err.message}` };
+        return { text: formatError(adapter, { message: err.message, code: "POOLS_ERROR" }) };
       }
     },
   });
@@ -570,7 +575,7 @@ export default function register(api: any) {
         const result = await openmm(["pool-discovery", "prices", token]);
         return { text: result };
       } catch (err: any) {
-        return { text: `Error fetching Cardano price: ${err.message}` };
+        return { text: formatError(adapter, { message: err.message, code: "CARDANO_ERROR" }) };
       }
     },
   });
@@ -592,7 +597,7 @@ export default function register(api: any) {
         const result = await openmm(args);
         return { text: result };
       } catch (err: any) {
-        return { text: `Error cancelling orders: ${err.message}` };
+        return { text: formatError(adapter, { message: err.message, code: "CANCEL_ERROR" }) };
       }
     },
   });

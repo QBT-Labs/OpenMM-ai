@@ -1,0 +1,14 @@
+{
+  "name": "@qbtlabs/shared",
+  "version": "0.1.0",
+  "description": "Shared formatting utilities for OpenMM AI — platform-specific adapters and domain formatters",
+  "type": "module",
+  "main": "src/index.ts",
+  "files": ["src", "README.md"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/QBT-Labs/OpenMM-ai.git",
+    "directory": "packages/shared"
+  }
+}
