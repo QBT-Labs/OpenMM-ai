@@ -6,6 +6,7 @@ export function formatNum(val: unknown): string {
   if (n === 0) return "0";
   if (Math.abs(n) >= 1000) return n.toLocaleString("en-US", { maximumFractionDigits: 2 });
   if (Math.abs(n) >= 1) return n.toLocaleString("en-US", { maximumFractionDigits: 6 });
-  // Small numbers — show up to 8 significant digits
-  return n.toPrecision(Math.min(8, Math.max(2, -Math.floor(Math.log10(Math.abs(n))) + 4)));
+  // Small numbers — show up to 8 significant digits, strip trailing zeros
+  const sig = Math.min(8, Math.max(2, -Math.floor(Math.log10(Math.abs(n))) + 4));
+  return parseFloat(n.toPrecision(sig)).toString();
 }

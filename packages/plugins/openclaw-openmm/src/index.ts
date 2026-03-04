@@ -2,7 +2,7 @@ import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { Type } from "@sinclair/typebox";
 import {
-  plainAdapter,
+  telegramAdapter,
   formatBalance,
   formatTicker,
   formatOrderbook,
@@ -151,12 +151,19 @@ function parseTrades(raw: string): TradeData[] {
 // Adapter resolution — pick the right adapter based on platform context
 // ---------------------------------------------------------------------------
 
-/** Resolve the format adapter for the current platform. Defaults to plain. */
+/** Resolve the format adapter for the current platform. */
 function getAdapter(_api: any): FormatAdapter {
-  // OpenClaw exposes the platform via api.platform or context.
-  // For now, default to plain — the LLM reads tool results as plain text.
-  // Auto-reply commands can pass the adapter explicitly.
-  return plainAdapter;
+  return telegramAdapter;
+}
+
+/** Strip CLI log lines (timestamps, connector info) from raw output. */
+function stripLogLines(raw: string): string {
+  return raw
+    .split("\n")
+    .filter((line) => !/^\d{2}:\d{2}:\d{2}\s+\[/.test(line))
+    .join("\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
 }
 
 // ---------------------------------------------------------------------------
@@ -552,7 +559,7 @@ export default function register(api: any) {
       }
       try {
         const result = await openmm(["pool-discovery", "discover", token]);
-        return { text: result };
+        return { text: stripLogLines(result) };
       } catch (err: any) {
         return { text: formatError(adapter, { message: err.message, code: "POOLS_ERROR" }) };
       }
@@ -570,7 +577,7 @@ export default function register(api: any) {
       }
       try {
         const result = await openmm(["pool-discovery", "prices", token]);
-        return { text: result };
+        return { text: stripLogLines(result) };
       } catch (err: any) {
         return { text: formatError(adapter, { message: err.message, code: "CARDANO_ERROR" }) };
       }
