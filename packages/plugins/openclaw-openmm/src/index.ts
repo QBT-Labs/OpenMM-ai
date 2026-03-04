@@ -2,7 +2,7 @@ import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { Type } from "@sinclair/typebox";
 import {
-  telegramAdapter,
+  plainAdapter,
   formatBalance,
   formatTicker,
   formatOrderbook,
@@ -153,14 +153,24 @@ function parseTrades(raw: string): TradeData[] {
 
 /** Resolve the format adapter for the current platform. */
 function getAdapter(_api: any): FormatAdapter {
-  return telegramAdapter;
+  // OpenClaw sends command responses as plain text (no Markdown parsing).
+  // Use plainAdapter so formatting is clean across all platforms.
+  return plainAdapter;
 }
 
-/** Strip CLI log lines (timestamps, connector info) from raw output. */
-function stripLogLines(raw: string): string {
+/** Strip CLI noise: log lines, ANSI codes, box-drawing dividers, and blank runs. */
+function cleanCliOutput(raw: string): string {
   return raw
     .split("\n")
-    .filter((line) => !/^\d{2}:\d{2}:\d{2}\s+\[/.test(line))
+    .filter((line) => {
+      // Drop timestamp log lines  (e.g. "01:33:19 [openmm] ...")
+      if (/^\d{2}:\d{2}:\d{2}\s+\[/.test(line)) return false;
+      // Drop lines that are only box-drawing or whitespace (═, ─, etc.)
+      if (/^[\s═─]+$/.test(line)) return false;
+      return true;
+    })
+    // Strip ANSI escape codes
+    .map((line) => line.replace(/\x1b\[[0-9;]*m/g, ""))
     .join("\n")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
@@ -559,7 +569,7 @@ export default function register(api: any) {
       }
       try {
         const result = await openmm(["pool-discovery", "discover", token]);
-        return { text: stripLogLines(result) };
+        return { text: cleanCliOutput(result) };
       } catch (err: any) {
         return { text: formatError(adapter, { message: err.message, code: "POOLS_ERROR" }) };
       }
@@ -577,7 +587,7 @@ export default function register(api: any) {
       }
       try {
         const result = await openmm(["pool-discovery", "prices", token]);
-        return { text: stripLogLines(result) };
+        return { text: cleanCliOutput(result) };
       } catch (err: any) {
         return { text: formatError(adapter, { message: err.message, code: "CARDANO_ERROR" }) };
       }
