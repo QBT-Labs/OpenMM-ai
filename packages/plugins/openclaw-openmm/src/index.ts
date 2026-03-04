@@ -62,19 +62,16 @@ function tryParseJson(raw: string): unknown | null {
   try {
     return JSON.parse(raw);
   } catch {
-    // CLI may prefix JSON with log/info lines — find the first { or [
-    const objStart = raw.indexOf("{");
-    const arrStart = raw.indexOf("[");
-    let start = -1;
-    if (objStart >= 0 && arrStart >= 0) start = Math.min(objStart, arrStart);
-    else if (objStart >= 0) start = objStart;
-    else if (arrStart >= 0) start = arrStart;
-
-    if (start > 0) {
+    // CLI may prefix JSON with log/info lines (e.g. Bitget/Kraken connectors
+    // emit {"serverTime":...} or info text before the real payload).
+    // Walk through each line-starting { or [ and try to parse from there.
+    const re = /^[\[{]/gm;
+    let match: RegExpExecArray | null;
+    while ((match = re.exec(raw)) !== null) {
       try {
-        return JSON.parse(raw.slice(start));
+        return JSON.parse(raw.slice(match.index));
       } catch {
-        return null;
+        // not valid from this position — try the next one
       }
     }
     return null;
