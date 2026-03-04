@@ -1,6 +1,6 @@
 {
   "name": "@qbtlabs/shared",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Shared formatting utilities for OpenMM AI — platform-specific adapters and domain formatters",
   "type": "module",
   "main": "src/index.ts",
