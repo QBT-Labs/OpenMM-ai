@@ -61,3 +61,28 @@ export interface ErrorData {
   code?: string;
   details?: string;
 }
+
+export interface CardanoPriceData {
+  symbol: string;
+  pools: { identifier: string; priceAda: number }[];
+  averagePriceAda: number;
+  priceUsdt?: number;
+  confidence?: number;
+  sources?: string[];
+  timestamp?: string;
+}
+
+export interface PoolDiscoveryData {
+  token: string;
+  policyId: string;
+  assetName: string;
+  totalPools: number;
+  totalLiquidity: number;
+  pools: {
+    identifier: string;
+    dex: string;
+    tvl: number;
+    isActive: boolean;
+  }[];
+  recommendedIdentifiers: string[];
+}

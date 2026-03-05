@@ -9,12 +9,16 @@ import {
   formatOrders,
   formatTrades,
   formatError,
+  formatCardanoPrice,
+  formatPoolDiscovery,
   type FormatAdapter,
   type BalanceEntry,
   type TickerData,
   type OrderbookData,
   type OrderData,
   type TradeData,
+  type CardanoPriceData,
+  type PoolDiscoveryData,
 } from "@qbtlabs/shared";
 
 const exec = promisify(execFile);
@@ -62,6 +66,7 @@ function tryParseJson(raw: string): unknown | null {
   try {
     return JSON.parse(raw);
   } catch {
+
     // CLI may prefix JSON with log/info lines (e.g. Bitget/Kraken connectors
     // emit {"serverTime":...} or info text before the real payload).
     // Walk through each line-starting { or [ and try to parse from there.
@@ -147,6 +152,44 @@ function parseTrades(raw: string): TradeData[] {
   }));
 }
 
+function parseCardanoPrice(raw: string): CardanoPriceData | null {
+  const data = tryParseJson(raw);
+  if (!data || typeof data !== "object") return null;
+  const d = data as any;
+  return {
+    symbol: String(d.symbol ?? ""),
+    pools: (d.pools ?? []).map((p: any) => ({
+      identifier: String(p.identifier ?? ""),
+      priceAda: Number(p.priceAda ?? 0),
+    })),
+    averagePriceAda: Number(d.averagePriceAda ?? 0),
+    priceUsdt: d.priceUsdt != null ? Number(d.priceUsdt) : undefined,
+    confidence: d.confidence != null ? Number(d.confidence) : undefined,
+    sources: d.sources ?? undefined,
+    timestamp: d.timestamp ?? undefined,
+  };
+}
+
+function parsePoolDiscovery(raw: string): PoolDiscoveryData | null {
+  const data = tryParseJson(raw);
+  if (!data || typeof data !== "object") return null;
+  const d = data as any;
+  return {
+    token: String(d.token ?? ""),
+    policyId: String(d.policyId ?? ""),
+    assetName: String(d.assetName ?? ""),
+    totalPools: Number(d.totalPools ?? 0),
+    totalLiquidity: Number(d.totalLiquidity ?? 0),
+    pools: (d.pools ?? []).map((p: any) => ({
+      identifier: String(p.identifier ?? ""),
+      dex: String(p.dex ?? "Unknown"),
+      tvl: Number(p.tvl ?? 0),
+      isActive: Boolean(p.isActive),
+    })),
+    recommendedIdentifiers: d.recommendedIdentifiers ?? [],
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Adapter resolution — pick the right adapter based on platform context
 // ---------------------------------------------------------------------------
@@ -158,23 +201,6 @@ function getAdapter(_api: any): FormatAdapter {
   return markdownAdapter;
 }
 
-/** Strip CLI noise: log lines, ANSI codes, box-drawing dividers, and blank runs. */
-function cleanCliOutput(raw: string): string {
-  return raw
-    .split("\n")
-    .filter((line) => {
-      // Drop timestamp log lines  (e.g. "01:33:19 [openmm] ...")
-      if (/^\d{2}:\d{2}:\d{2}\s+\[/.test(line)) return false;
-      // Drop lines that are only box-drawing or whitespace (═, ─, etc.)
-      if (/^[\s═─]+$/.test(line)) return false;
-      return true;
-    })
-    // Strip ANSI escape codes
-    .map((line) => line.replace(/\x1b\[[0-9;]*m/g, ""))
-    .join("\n")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim();
-}
 
 // ---------------------------------------------------------------------------
 // Plugin entry
@@ -438,7 +464,10 @@ export default function register(api: any) {
       symbol: Type.String({ description: "Cardano token symbol, e.g. SNEK, INDY, NIGHT" }),
     }),
     async execute(_id: string, params: { symbol: string }) {
-      return text(await openmm(["pool-discovery", "prices", params.symbol]));
+      const raw = await openmm(["pool-discovery", "prices", params.symbol, "--json"]);
+      const parsed = parseCardanoPrice(raw);
+      if (!parsed) return text(raw);
+      return text(formatCardanoPrice(adapter, parsed));
     },
   });
 
@@ -451,9 +480,12 @@ export default function register(api: any) {
       minLiquidity: Type.Optional(Type.Number({ description: "Minimum TVL in ADA to filter pools" })),
     }),
     async execute(_id: string, params: { symbol: string; minLiquidity?: number }) {
-      const args = ["pool-discovery", "discover", params.symbol];
+      const args = ["pool-discovery", "discover", params.symbol, "--json"];
       if (params.minLiquidity) args.push("--min-liquidity", String(params.minLiquidity));
-      return text(await openmm(args));
+      const raw = await openmm(args);
+      const parsed = parsePoolDiscovery(raw);
+      if (!parsed) return text(raw);
+      return text(formatPoolDiscovery(adapter, parsed));
     },
   });
 
@@ -568,8 +600,10 @@ export default function register(api: any) {
         return { text: "Usage: /pools <token>\nExample: /pools SNEK" };
       }
       try {
-        const result = await openmm(["pool-discovery", "discover", token]);
-        return { text: cleanCliOutput(result) };
+        const raw = await openmm(["pool-discovery", "discover", token, "--json"]);
+        const parsed = parsePoolDiscovery(raw);
+        if (!parsed) return { text: raw };
+        return { text: formatPoolDiscovery(adapter, parsed) };
       } catch (err: any) {
         return { text: formatError(adapter, { message: err.message, code: "POOLS_ERROR" }) };
       }
@@ -586,8 +620,10 @@ export default function register(api: any) {
         return { text: "Usage: /cardano <token>\nExample: /cardano INDY" };
       }
       try {
-        const result = await openmm(["pool-discovery", "prices", token]);
-        return { text: cleanCliOutput(result) };
+        const raw = await openmm(["pool-discovery", "prices", token, "--json"]);
+        const parsed = parseCardanoPrice(raw);
+        if (!parsed) return { text: raw };
+        return { text: formatCardanoPrice(adapter, parsed) };
       } catch (err: any) {
         return { text: formatError(adapter, { message: err.message, code: "CARDANO_ERROR" }) };
       }

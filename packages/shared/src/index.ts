@@ -7,6 +7,8 @@ export type {
   OrderData,
   TradeData,
   ErrorData,
+  CardanoPriceData,
+  PoolDiscoveryData,
 } from "./types.js";
 
 export {
@@ -32,4 +34,6 @@ export {
   formatOrders,
   formatTrades,
   formatError,
+  formatCardanoPrice,
+  formatPoolDiscovery,
 } from "./formatters/index.js";
