@@ -10,3 +10,4 @@ export {
   type SlackBlock,
 } from "./slack.js";
 export { whatsappAdapter } from "./whatsapp.js";
+export { markdownAdapter } from "./markdown.js";

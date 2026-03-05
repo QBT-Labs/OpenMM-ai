@@ -2,7 +2,7 @@ import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { Type } from "@sinclair/typebox";
 import {
-  plainAdapter,
+  markdownAdapter,
   formatBalance,
   formatTicker,
   formatOrderbook,
@@ -153,9 +153,9 @@ function parseTrades(raw: string): TradeData[] {
 
 /** Resolve the format adapter for the current platform. */
 function getAdapter(_api: any): FormatAdapter {
-  // OpenClaw sends command responses as plain text (no Markdown parsing).
-  // Use plainAdapter so formatting is clean across all platforms.
-  return plainAdapter;
+  // OpenClaw parses standard Markdown through its IR pipeline and renders
+  // per-platform (HTML for Telegram, mrkdwn for Slack, text+spans for Signal).
+  return markdownAdapter;
 }
 
 /** Strip CLI noise: log lines, ANSI codes, box-drawing dividers, and blank runs. */

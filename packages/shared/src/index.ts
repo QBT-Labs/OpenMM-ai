@@ -20,6 +20,7 @@ export {
   createSlackFields,
   createSlackDivider,
   whatsappAdapter,
+  markdownAdapter,
 } from "./adapters/index.js";
 
 export {
