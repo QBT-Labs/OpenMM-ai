@@ -1,5 +1,5 @@
 {
-  "id": "openmm",
+  "id": "openclaw-openmm",
   "configSchema": {
     "type": "object",
     "properties": {
