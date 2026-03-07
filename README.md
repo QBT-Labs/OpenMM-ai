@@ -13,6 +13,7 @@
 [![openclaw-openmm](https://img.shields.io/npm/v/@qbtlabs/openclaw-openmm?label=openclaw-openmm)](https://www.npmjs.com/package/@qbtlabs/openclaw-openmm)
 [![downloads](https://img.shields.io/npm/dm/@qbtlabs/openclaw-openmm)](https://www.npmjs.com/package/@qbtlabs/openclaw-openmm)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Smithery Skills](https://img.shields.io/badge/Smithery-5_skills-green)](https://smithery.ai/skills?q=qbtlabs)
 [![DeepWiki](https://img.shields.io/badge/docs-DeepWiki-purple)](https://deepwiki.com/3rd-Eye-Labs/OpenMM)
 
 [Agent Skills](https://agentskills.io/home) for [OpenMM](https://github.com/3rd-Eye-Labs/OpenMM) — multi-exchange trading, grid strategies, portfolio management, and real-time market data for AI agents.
@@ -98,13 +99,13 @@ clawhub install openmm-portfolio
 
 ## Skills
 
-| Skill | Description |
-|-------|-------------|
-| **openmm-portfolio** | Balance tracking, order overview, and market data across exchanges |
-| **openmm-exchange-setup** | Step-by-step guide to configure exchange API credentials |
-| **openmm-grid-trading** | Automated grid trading strategies with dry-run support |
-| **openmm-order-management** | Place, list, and cancel limit/market orders |
-| **openmm-cardano-dex** | Cardano DEX pool discovery and aggregated pricing via Iris Protocol |
+| Skill | Description | Smithery |
+|-------|-------------|----------|
+| **openmm-portfolio** | Balance tracking, order overview, and market data across exchanges | [![activations](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.smithery.ai%2Fskills%3Fnamespace%3Dqbtlabs%26slug%3Dopenmm-portfolio&query=%24.skills%5B0%5D.totalActivations&label=activations&color=green)](https://smithery.ai/skill/qbtlabs/openmm-portfolio) |
+| **openmm-exchange-setup** | Step-by-step guide to configure exchange API credentials | [![activations](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.smithery.ai%2Fskills%3Fnamespace%3Dqbtlabs%26slug%3Dopenmm-exchange-setup&query=%24.skills%5B0%5D.totalActivations&label=activations&color=green)](https://smithery.ai/skill/qbtlabs/openmm-exchange-setup) |
+| **openmm-grid-trading** | Automated grid trading strategies with dry-run support | [![activations](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.smithery.ai%2Fskills%3Fnamespace%3Dqbtlabs%26slug%3Dopenmm-grid-trading&query=%24.skills%5B0%5D.totalActivations&label=activations&color=green)](https://smithery.ai/skill/qbtlabs/openmm-grid-trading) |
+| **openmm-order-management** | Place, list, and cancel limit/market orders | [![activations](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.smithery.ai%2Fskills%3Fnamespace%3Dqbtlabs%26slug%3Dopenmm-order-management&query=%24.skills%5B0%5D.totalActivations&label=activations&color=green)](https://smithery.ai/skill/qbtlabs/openmm-order-management) |
+| **openmm-cardano-dex** | Cardano DEX pool discovery and aggregated pricing via Iris Protocol | [![activations](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.smithery.ai%2Fskills%3Fnamespace%3Dqbtlabs%26slug%3Dopenmm-cardano-dex&query=%24.skills%5B0%5D.totalActivations&label=activations&color=green)](https://smithery.ai/skill/qbtlabs/openmm-cardano-dex) |
 
 ---
 
