@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OpenMM Skills Ecosystem</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0a0b14;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    color: #fff;
+  }
+
+  .canvas {
+    width: 1200px;
+    height: 480px;
+    background: linear-gradient(135deg, #0a0b14 0%, #0f1029 40%, #130f2a 70%, #0a0b14 100%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .canvas::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image:
+      linear-gradient(rgba(139,92,246,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(139,92,246,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    z-index: 0;
+  }
+
+  .glow-1 {
+    position: absolute;
+    width: 350px; height: 350px;
+    background: radial-gradient(circle, rgba(139,92,246,0.12) 0%, transparent 70%);
+    top: -80px; right: 200px;
+    z-index: 0;
+  }
+  .glow-2 {
+    position: absolute;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%);
+    bottom: -50px; left: 100px;
+    z-index: 0;
+  }
+
+  /* Title */
+  .title {
+    position: absolute;
+    top: 24px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    z-index: 2;
+  }
+  .title h1 {
+    font-size: 22px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.5px;
+  }
+  .title h1 span {
+    background: linear-gradient(135deg, #a78bfa, #60a5fa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .title p {
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+    margin-top: 3px;
+  }
+
+  /* Center command */
+  .command-bar {
+    position: absolute;
+    top: 76px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(139,92,246,0.25);
+    border-radius: 10px;
+    padding: 10px 28px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .command-bar .prompt {
+    color: rgba(16,185,129,0.7);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .command-bar .cmd {
+    color: rgba(255,255,255,0.9);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  /* Three columns layout */
+  .columns {
+    position: absolute;
+    top: 125px;
+    left: 40px;
+    right: 40px;
+    display: flex;
+    gap: 20px;
+    z-index: 2;
+  }
+
+  .col {
+    flex: 1;
+  }
+
+  .col-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .col-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+  .col-icon.purple {
+    background: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(139,92,246,0.05));
+    border: 1px solid rgba(139,92,246,0.3);
+  }
+  .col-icon.blue {
+    background: linear-gradient(135deg, rgba(59,130,246,0.2), rgba(59,130,246,0.05));
+    border: 1px solid rgba(59,130,246,0.3);
+  }
+  .col-icon.green {
+    background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(16,185,129,0.05));
+    border: 1px solid rgba(16,185,129,0.3);
+  }
+  .col-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .col-subtitle {
+    font-size: 9px;
+    color: rgba(255,255,255,0.35);
+    margin-top: 1px;
+  }
+
+  /* Skill cards */
+  .skill-card {
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .skill-card:hover {
+    border-color: rgba(139,92,246,0.15);
+  }
+  .skill-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin-top: 5px;
+    flex-shrink: 0;
+  }
+  .skill-dot.purple { background: #8b5cf6; box-shadow: 0 0 6px rgba(139,92,246,0.5); }
+  .skill-dot.blue { background: #3b82f6; box-shadow: 0 0 6px rgba(59,130,246,0.5); }
+  .skill-dot.green { background: #10b981; box-shadow: 0 0 6px rgba(16,185,129,0.5); }
+  .skill-dot.teal { background: #14b8a6; box-shadow: 0 0 6px rgba(20,184,166,0.5); }
+  .skill-dot.amber { background: #f59e0b; box-shadow: 0 0 6px rgba(245,158,11,0.5); }
+
+  .skill-info { flex: 1; }
+  .skill-name {
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.9);
+    font-family: 'JetBrains Mono', monospace;
+    margin-bottom: 2px;
+  }
+  .skill-desc {
+    font-size: 9.5px;
+    color: rgba(255,255,255,0.4);
+    line-height: 1.35;
+  }
+
+  /* Agent list */
+  .agent-item {
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 8px;
+    padding: 8px 14px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .agent-check {
+    color: rgba(16,185,129,0.7);
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .agent-name {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.8);
+  }
+
+  /* Exchange badges */
+  .exchange-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .exchange-badge {
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 8px;
+    padding: 12px 14px;
+    text-align: center;
+  }
+  .exchange-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.85);
+    margin-bottom: 2px;
+  }
+  .exchange-min {
+    font-size: 9px;
+    color: rgba(255,255,255,0.35);
+  }
+
+  /* Stats bar */
+  .stats {
+    position: absolute;
+    bottom: 48px;
+    left: 40px;
+    right: 40px;
+    display: flex;
+    gap: 0;
+    z-index: 2;
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .stat {
+    flex: 1;
+    padding: 10px 16px;
+    text-align: center;
+    border-right: 1px solid rgba(255,255,255,0.04);
+  }
+  .stat:last-child { border-right: none; }
+  .stat-value {
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 1px;
+  }
+  .stat-value.purple { color: #a78bfa; }
+  .stat-value.blue { color: #60a5fa; }
+  .stat-value.green { color: #34d399; }
+  .stat-value.teal { color: #2dd4bf; }
+  .stat-label {
+    font-size: 9px;
+    color: rgba(255,255,255,0.35);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-weight: 600;
+  }
+
+  /* Footer */
+  .footer {
+    position: absolute;
+    bottom: 12px;
+    left: 40px;
+    right: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 2;
+  }
+  .footer-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .qbt-logo {
+    width: 24px;
+    height: 24px;
+    background: linear-gradient(135deg, #8b5cf6, #6366f1);
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 12px;
+    color: #fff;
+  }
+  .footer-brand {
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.6);
+  }
+  .footer-right {
+    font-size: 10px;
+    color: rgba(255,255,255,0.25);
+  }
+  .footer-right span {
+    background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(16,185,129,0.05));
+    border: 1px solid rgba(16,185,129,0.3);
+    padding: 2px 8px;
+    border-radius: 20px;
+    color: rgba(16,185,129,0.8);
+    font-weight: 600;
+    font-size: 9px;
+    margin-left: 6px;
+  }
+</style>
+</head>
+<body>
+<div class="canvas">
+  <div class="glow-1"></div>
+  <div class="glow-2"></div>
+
+  <!-- Title -->
+  <div class="title">
+    <h1>The <span>OpenMM Skills</span> Ecosystem</h1>
+    <p>5 skills, 4 exchanges, 13 MCP tools — one command to install</p>
+  </div>
+
+  <!-- Command bar -->
+  <div class="command-bar">
+    <span class="prompt">$</span>
+    <span class="cmd">npx @qbtlabs/openmm-skills</span>
+  </div>
+
+  <!-- Three columns -->
+  <div class="columns">
+    <!-- Skills column -->
+    <div class="col">
+      <div class="col-header">
+        <div class="col-icon purple">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(167,139,250,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        </div>
+        <div>
+          <div class="col-title">Skills</div>
+          <div class="col-subtitle">Portable SKILL.md files</div>
+        </div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-dot purple"></div>
+        <div class="skill-info">
+          <div class="skill-name">openmm-portfolio</div>
+          <div class="skill-desc">Balance tracking &amp; market data</div>
+        </div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-dot blue"></div>
+        <div class="skill-info">
+          <div class="skill-name">openmm-grid-trading</div>
+          <div class="skill-desc">Automated grid strategies</div>
+        </div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-dot green"></div>
+        <div class="skill-info">
+          <div class="skill-name">openmm-order-management</div>
+          <div class="skill-desc">Place, list &amp; cancel orders</div>
+        </div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-dot teal"></div>
+        <div class="skill-info">
+          <div class="skill-name">openmm-exchange-setup</div>
+          <div class="skill-desc">API credential configuration</div>
+        </div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-dot amber"></div>
+        <div class="skill-info">
+          <div class="skill-name">openmm-cardano-dex</div>
+          <div class="skill-desc">DEX pools via Iris Protocol</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Agents column -->
+    <div class="col">
+      <div class="col-header">
+        <div class="col-icon blue">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(96,165,250,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><path d="M9 9h6M9 13h6M9 17h4"/></svg>
+        </div>
+        <div>
+          <div class="col-title">Compatible Agents</div>
+          <div class="col-subtitle">40+ supported platforms</div>
+        </div>
+      </div>
+      <div class="agent-item">
+        <span class="agent-check">&#10003;</span>
+        <span class="agent-name">OpenAI Codex</span>
+      </div>
+      <div class="agent-item">
+        <span class="agent-check">&#10003;</span>
+        <span class="agent-name">Gemini CLI</span>
+      </div>
+      <div class="agent-item">
+        <span class="agent-check">&#10003;</span>
+        <span class="agent-name">GitHub Copilot</span>
+      </div>
+      <div class="agent-item">
+        <span class="agent-check">&#10003;</span>
+        <span class="agent-name">Cursor</span>
+      </div>
+      <div class="agent-item">
+        <span class="agent-check">&#10003;</span>
+        <span class="agent-name">Claude Code</span>
+      </div>
+      <div class="agent-item">
+        <span class="agent-check">&#10003;</span>
+        <span class="agent-name">Amp, Kimi, OpenCode +34 more</span>
+      </div>
+    </div>
+
+    <!-- Exchanges column -->
+    <div class="col">
+      <div class="col-header">
+        <div class="col-icon green">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(52,211,153,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9 9c1.66 0 3-4.03 3-9s-1.34-9-3-9m0 18c-1.66 0-3-4.03-3-9s1.34-9 3-9m-9 9a9 9 0 0 1 9-9"/></svg>
+        </div>
+        <div>
+          <div class="col-title">Exchanges</div>
+          <div class="col-subtitle">Real trading, real order books</div>
+        </div>
+      </div>
+      <div class="exchange-grid">
+        <div class="exchange-badge">
+          <div class="exchange-name">MEXC</div>
+          <div class="exchange-min">Min: 1 USDT</div>
+        </div>
+        <div class="exchange-badge">
+          <div class="exchange-name">Gate.io</div>
+          <div class="exchange-min">Min: 1 USDT</div>
+        </div>
+        <div class="exchange-badge">
+          <div class="exchange-name">Bitget</div>
+          <div class="exchange-min">Min: 1 USDT</div>
+        </div>
+        <div class="exchange-badge">
+          <div class="exchange-name">Kraken</div>
+          <div class="exchange-min">Min: 5 EUR</div>
+        </div>
+      </div>
+      <div style="margin-top:10px;">
+        <div class="skill-card">
+          <div class="skill-dot green"></div>
+          <div class="skill-info">
+            <div class="skill-name" style="color:rgba(52,211,153,0.9)">+ Cardano DEX</div>
+            <div class="skill-desc">Iris Protocol integration</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats bar -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-value purple">5</div>
+      <div class="stat-label">Skills</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value blue">13</div>
+      <div class="stat-label">MCP Tools</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value green">4</div>
+      <div class="stat-label">Exchanges</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value teal">40+</div>
+      <div class="stat-label">Agents</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" style="color:#f59e0b">MIT</div>
+      <div class="stat-label">License</div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <div class="footer-left">
+      <div class="qbt-logo">Q</div>
+      <div class="footer-brand">QBT Labs</div>
+    </div>
+    <div class="footer-right">
+      github.com/QBT-Labs/OpenMM-ai
+      <span>Open Source</span>
+    </div>
+  </div>
+</div>
+</body>
+</html>
